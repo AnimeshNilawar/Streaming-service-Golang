@@ -1,0 +1,136 @@
+/* UploadPage.css - Styling for the video upload page */
+
+.upload-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: #1e1e1e;
+    color: #f5f5f5;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.upload-title {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    color: #fff;
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #ddd;
+}
+
+.form-group input[type="text"] {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #444;
+    border-radius: 6px;
+    background-color: #2c2c2c;
+    color: #fff;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.form-group input[type="text"]:focus {
+    border-color: #6c9ee7;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(108, 158, 231, 0.25);
+}
+
+.form-group input[type="file"] {
+    width: 100%;
+    padding: 0.5rem;
+    color: #ddd;
+    background-color: #2c2c2c;
+    border: 1px solid #444;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.form-group input[type="file"]::file-selector-button {
+    background-color: #3d3d3d;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    margin-right: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.form-group input[type="file"]::file-selector-button:hover {
+    background-color: #4a4a4a;
+}
+
+.message {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border-radius: 6px;
+    font-size: 0.95rem;
+}
+
+.success {
+    background-color: #1e3b2c;
+    color: #84e4a0;
+    border: 1px solid #2a5135;
+}
+
+.error {
+    background-color: #3b1e1e;
+    color: #e48484;
+    border: 1px solid #512a2a;
+}
+
+button {
+    width: 100%;
+    padding: 0.85rem;
+    background-color: #405cf5;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #3349db;
+}
+
+.button-disabled {
+    background-color: #2c3a87;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.upload-success-message {
+    text-align: center;
+    margin: 1.5rem 0;
+}
+
+.video-link {
+    display: inline-block;
+    margin-top: 1rem;
+    background-color: #2d2d2d;
+    color: #6c9ee7;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background-color 0.3s;
+}
+
+.video-link:hover {
+    background-color: #363636;
+    text-decoration: underline;
+}

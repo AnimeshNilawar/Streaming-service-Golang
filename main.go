@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"time"
@@ -22,6 +23,7 @@ type VideoMeta struct {
 	Path       string
 	UploadDate time.Time
 	Duration   string
+	Thumbnail  string
 }
 
 // Init Postgres DB
@@ -31,7 +33,7 @@ func InitDB() *sql.DB {
 	if err != nil {
 		log.Fatal("Failed to connect to DB:", err)
 	}
-    if err := db.Ping(); err != nil {
+	if err := db.Ping(); err != nil {
 		log.Fatal("Cannot reach DB:", err)
 	}
 
@@ -42,7 +44,8 @@ func InitDB() *sql.DB {
 		name TEXT NOT NULL,
 		path TEXT NOT NULL,
 		upload_date TIMESTAMP NOT NULL,
-		duration TEXT NOT NULL
+		duration TEXT NOT NULL,
+		thumbnail TEXT
 	);
 	`
 	_, err = db.Exec(createTableQuery)
@@ -70,13 +73,38 @@ func getVideoDuration(path string) (string, error) {
 	return string(output), nil
 }
 
+// Generate thumbnail from video
+// func generateThumbnail(videoPath string, videoID string) (string, error) {
+// 	// Create thumbnails directory if it doesn't exist
+// 	thumbnailDir := "static/thumbnails"
+// 	if err := os.MkdirAll(thumbnailDir, 0755); err != nil {
+// 		return "", err
+// 	}
+
+// 	// Generate thumbnail at 1 second mark
+// 	thumbnailPath := filepath.ToSlash(filepath.Join(thumbnailDir, videoID+".jpg"))
+// 	cmd := exec.Command("ffmpeg",
+// 		"-i", videoPath,
+// 		"-ss", "00:00:01.000",
+// 		"-vframes", "1",
+// 		"-vf", "scale=480:-1",
+// 		thumbnailPath,
+// 	)
+
+// 	if err := cmd.Run(); err != nil {
+// 		return "", err
+// 	}
+
+// 	return thumbnailPath, nil
+// }
+
 // Handle Upload
 func uploadHandler(c *gin.Context, db *sql.DB) {
 	// Get form fields
 	videoName := c.PostForm("video_name")
 	file, err := c.FormFile("file")
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "No file is received"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "No video file is received"})
 		return
 	}
 
@@ -86,7 +114,7 @@ func uploadHandler(c *gin.Context, db *sql.DB) {
 
 	// Save file locally
 	if err := c.SaveUploadedFile(file, uploadPath); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to save file"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to save video file"})
 		return
 	}
 
@@ -97,10 +125,34 @@ func uploadHandler(c *gin.Context, db *sql.DB) {
 		return
 	}
 
+	// Check if thumbnail was uploaded
+	var thumbnailPath string
+	thumbnailFile, err := c.FormFile("thumbnail")
+	if err == nil {
+		// Create thumbnails directory if it doesn't exist
+		thumbnailDir := "static/thumbnails"
+		if err := os.MkdirAll(thumbnailDir, 0755); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to create thumbnail directory"})
+			return
+		}
+
+		// Save thumbnail with same ID as video but with image extension
+		thumbnailExt := filepath.Ext(thumbnailFile.Filename)
+		if thumbnailExt == "" {
+			thumbnailExt = ".jpg" // Default extension if none provided
+		}
+		thumbnailPath = filepath.ToSlash(filepath.Join(thumbnailDir, videoID+thumbnailExt))
+
+		if err := c.SaveUploadedFile(thumbnailFile, thumbnailPath); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to save thumbnail"})
+			return
+		}
+	}
+
 	// Save metadata in DB
-	query := `INSERT INTO videos (id, name, path, upload_date, duration) 
-          VALUES ($1, $2, $3, $4, $5)`
-	_, err = db.Exec(query, videoID, videoName, uploadPath, time.Now(), duration)
+	query := `INSERT INTO videos (id, name, path, upload_date, duration, thumbnail) 
+          VALUES ($1, $2, $3, $4, $5, $6)`
+	_, err = db.Exec(query, videoID, videoName, uploadPath, time.Now(), duration, thumbnailPath)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "DB insert failed"})
 		return
@@ -112,13 +164,20 @@ func uploadHandler(c *gin.Context, db *sql.DB) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
+	response := gin.H{
 		"message":  "Upload & Processing successful",
 		"video_id": videoID,
 		"hls_url":  "/static/" + videoID + "_hls/playlist.m3u8",
 		"dash_url": "/static/" + videoID + "_dash/manifest.mpd",
 		"duration": duration,
-	})
+	}
+
+	// Add thumbnail URL to response if it exists
+	if thumbnailPath != "" {
+		response["thumbnail"] = "/" + thumbnailPath
+	}
+
+	c.JSON(http.StatusOK, response)
 }
 
 func main() {
@@ -127,14 +186,14 @@ func main() {
 
 	router := gin.Default()
 
-    router.Use(cors.New(cors.Config{
-        AllowOrigins:     []string{"*"},
-        AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-        AllowHeaders:     []string{"Origin", "Content-Type", "Accept"},
-        ExposeHeaders:    []string{"Content-Length"},
-        AllowCredentials: true,
-    }))
-    
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+	}))
+
 	// Serve static HLS/DASH folders
 	router.Static("/static", "./static")
 

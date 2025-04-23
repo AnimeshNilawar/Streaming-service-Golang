@@ -1,0 +1,90 @@
+# Video Streaming Platform with DASH & HLS Support
+
+## Slide 1: Project Overview
+- A full-stack video streaming platform designed to deliver high-quality content with adaptive streaming
+- Backend: Go (Gin framework) providing a robust, high-performance API service
+- Frontend: React with DASH.js player for responsive, modern user interface
+- Features adaptive bitrate streaming with DASH and HLS formats, allowing seamless playback on any device or network condition
+- Supports video upload, processing, and playback with multi-resolution encoding for optimal viewing experience
+- Developed to demonstrate modern video streaming technologies in a practical implementation
+
+## Slide 2: System Architecture
+- Go backend server (port 8080) handling API requests, file processing, and streaming
+- React frontend application providing intuitive user interface for video management
+- PostgreSQL database for video metadata storage including titles, descriptions, and technical information
+- FFmpeg for video transcoding into multiple quality levels (360p, 720p, 1080p)
+- Static file server for streaming media segments with efficient caching and delivery
+- Microservice architecture allowing independent scaling of components based on demand
+
+## Slide 3: Backend Components
+- Video upload handler with multipart form support for reliable file transfers of any size
+- FFmpeg integration for video processing with custom encoding profiles for optimal quality-to-size ratio
+- DASH/HLS manifest generation with automatic adaptation to source content characteristics
+- PostgreSQL database for metadata storage with efficient querying capabilities
+- UUID-based video identification system ensuring unique and secure video references
+- RESTful API endpoints for video management, status updates, and content delivery
+
+## Slide 4: Frontend Components
+- React application built with Vite for fast development and optimized production builds
+- DASH.js media player integration with custom controls and monitoring features
+- Adaptive streaming visualization showing real-time quality switches and buffer status
+- Real-time playback statistics dashboard providing insights into streaming performance
+- Simple video loading interface with drag-and-drop functionality and progress indicators
+- Responsive design ensuring optimal viewing experience across desktop and mobile devices
+
+## Slide 5: Video Processing Workflow
+1. Client uploads video file through the web interface or API endpoint
+2. Server generates unique video ID (UUID) and creates database entry for the new content
+3. FFmpeg processes video into multiple qualities (360p, 720p, 1080p) with bitrate optimization
+4. Creates DASH manifest (.mpd) and segment files (.m4s) with 6-second chunks for optimal streaming
+5. Creates HLS playlist (.m3u8) and segment files (.ts) for Apple device compatibility
+6. Metadata stored in PostgreSQL database including duration, resolutions, and technical specs
+7. Client is notified when processing is complete and video is ready for playback
+
+## Slide 6: Adaptive Streaming Features
+- Multiple quality levels (360p, 720p, 1080p) encoded with optimized H.264 profiles
+- Automatic bitrate adaptation based on network conditions using DASH.js ABR algorithms
+- Buffer monitoring for smooth playback with configurable buffer thresholds (default: 15 seconds)
+- Bandwidth estimation and quality switching with minimal interruption to viewer experience
+- Frame rate optimization ensuring consistent playback even during network fluctuations
+- Support for both DASH (for modern browsers) and HLS (for iOS devices) from the same source content
+- Configurable adaptation logic allowing for quality preference vs. buffer stability customization
+
+## Slide 7: Playback Analytics
+- Real-time download speed tracking with historical graphs showing network performance
+- Buffer level monitoring with visual indicators for remaining playback time
+- Current bitrate display showing active quality level and available alternatives
+- Dropped frames counter identifying potential performance issues
+- Visual statistics dashboard with toggleable metrics for detailed analysis
+- Session-based analytics storage for post-viewing performance review
+- Network condition simulation tools for testing adaptive behavior
+
+## Slide 8: Technology Stack
+- Go 1.24.2 powering the backend with goroutines for efficient concurrent processing
+- Gin web framework providing fast HTTP routing and middleware support
+- React 19 with hooks and context API for state management
+- DASH.js 5.0.1 with customized adaptive bitrate algorithms
+- PostgreSQL for reliable and scalable metadata storage
+- FFmpeg with custom compilation including AAC, H.264, and H.265 codecs
+- Vite build system for rapid development and optimized deployment
+- Docker containerization for consistent development and production environments
+
+## Slide 9: Future Enhancements
+- User authentication system with role-based access control for content management
+- Video library management with categories, tags, and search functionality
+- Analytics dashboard for content creators showing viewer engagement metrics
+- Content protection (DRM) integration supporting Widevine, PlayReady, and FairPlay
+- Mobile application support with native players for iOS and Android
+- Live streaming capability with ultra-low latency (sub-3 second) delivery
+- AI-powered content analysis for automatic metadata generation and scene detection
+- Multi-CDN support for optimized global content delivery
+
+## Slide 10: Demo & Conclusion
+- Live demonstration of video upload process showing progress and transcoding steps
+- Playback with network throttling to demonstrate adaptive streaming capabilities
+- Quality adaptation visualization highlighting bitrate changes based on conditions
+- Performance metrics review showing buffer health and download speeds in real-time
+- Key takeaways: modern streaming technologies enable high-quality video delivery in challenging network conditions
+- Next steps: implementing user feedback and expanding platform capabilities
+- Q&A session addressing technical implementation details and design decisions
+- Contact information and repository access for follow-up questions

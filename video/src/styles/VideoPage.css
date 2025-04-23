@@ -1,0 +1,248 @@
+/* VideoPage.css - Styling for the video display page */
+
+.video-page-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: #121212;
+    color: #f5f5f5;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.video-page-container.loading,
+.video-page-container.error {
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    text-align: center;
+}
+
+.video-page-container.error {
+    color: #ff6b6b;
+}
+
+.video-header {
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #333;
+    padding-bottom: 1rem;
+}
+
+.video-title {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: #fff;
+}
+
+.video-meta {
+    display: flex;
+    gap: 1.5rem;
+    color: #aaa;
+    font-size: 0.9rem;
+}
+
+.video-player-container {
+    margin-bottom: 2rem;
+    background-color: #000;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    /* Fixed dimensions container */
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Player container with fixed aspect ratio */
+.player-container {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    overflow: hidden;
+}
+
+/* Video element with fixed positioning */
+.video-player {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Maintain aspect ratio without stretching */
+    background-color: #000;
+}
+
+/* Stats container */
+.video-stats {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #1a1a1a;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-family: monospace;
+}
+
+.video-stats .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+
+.video-stats .flex {
+    display: flex;
+    align-items: center;
+}
+
+.video-stats .mr-2 {
+    margin-right: 0.5rem;
+}
+
+/* Debug link and quality controls */
+.debug-link {
+    margin-top: 0.5rem;
+    text-align: right;
+    font-size: 0.75rem;
+}
+
+.debug-link a {
+    color: #666;
+    text-decoration: none;
+}
+
+.debug-link a:hover {
+    text-decoration: underline;
+    color: #999;
+}
+
+.quality-control {
+    position: absolute;
+    bottom: 70px;
+    right: 20px;
+    z-index: 10;
+}
+
+.quality-button {
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 0.875rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.quality-button:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.gear-icon {
+    font-size: 1rem;
+}
+
+.quality-menu {
+    position: absolute;
+    bottom: 100%;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.85);
+    border-radius: 4px;
+    overflow: hidden;
+    width: 200px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.quality-menu-header {
+    padding: 8px 12px;
+    background-color: rgba(0, 0, 0, 0.3);
+    font-weight: bold;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.quality-options {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.quality-options li {
+    padding: 8px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.quality-options li:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.quality-options li.active {
+    background-color: rgba(66, 133, 244, 0.5);
+}
+
+.error-message {
+    background-color: rgba(244, 67, 54, 0.1);
+    border: 1px solid rgba(244, 67, 54, 0.3);
+    color: #f44336;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+}
+
+.video-details {
+    background-color: #1e1e1e;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-top: 2rem;
+}
+
+.video-links h3 {
+    margin-bottom: 1rem;
+    color: #ddd;
+    font-size: 1.25rem;
+}
+
+.link-item {
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    background-color: #252525;
+    padding: 1rem;
+    border-radius: 6px;
+}
+
+.link-label {
+    font-weight: bold;
+    color: #aaa;
+    margin-bottom: 0.5rem;
+}
+
+.link-item a {
+    color: #6c9ee7;
+    text-decoration: none;
+    word-break: break-all;
+}
+
+.link-item a:hover {
+    text-decoration: underline;
+    color: #8ab4f8;
+}
+
+@media (max-width: 768px) {
+    .video-page-container {
+        padding: 1rem;
+    }
+
+    .video-meta {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .video-title {
+        font-size: 1.5rem;
+    }
+}
