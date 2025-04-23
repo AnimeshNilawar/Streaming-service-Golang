@@ -1,9 +1,10 @@
 // App.jsx
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, NavLink } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
 import DashPlayer from './components/DashPlayer';
 import UploadPage from './components/UploadPage';
 import VideoPage from './components/VideoPage';
+import HomePage from './components/HomePage';
 import './styles/AppDark.css';
 
 const App = () => {
@@ -27,12 +28,7 @@ const App = () => {
 
         <main className="main-content">
           <Routes>
-            <Route path="/" element={
-              <div>
-                <h2>My Packetized DASH Player</h2>
-                <DashPlayer />
-              </div>
-            } />
+            <Route path="/" element={<HomePage />} />
             <Route path="/upload" element={<UploadPage />} />
             <Route path="/video/:videoId" element={<VideoPage />} />
           </Routes>

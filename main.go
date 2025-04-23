@@ -180,6 +180,86 @@ func uploadHandler(c *gin.Context, db *sql.DB) {
 	c.JSON(http.StatusOK, response)
 }
 
+// Get all videos
+func getAllVideosHandler(c *gin.Context, db *sql.DB) {
+	// Query to get all videos from database
+	rows, err := db.Query("SELECT id, name, path, upload_date, duration, thumbnail FROM videos ORDER BY upload_date DESC")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch videos"})
+		return
+	}
+	defer rows.Close()
+
+	// Slice to hold all videos
+	var videos []gin.H
+
+	// Iterate through rows
+	for rows.Next() {
+		var video VideoMeta
+		if err := rows.Scan(&video.ID, &video.Name, &video.Path, &video.UploadDate, &video.Duration, &video.Thumbnail); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error scanning video data"})
+			return
+		}
+
+		// Create response object with needed fields
+		videoData := gin.H{
+			"id":        video.ID,
+			"name":      video.Name,
+			"duration":  video.Duration,
+			"timestamp": video.UploadDate,
+		}
+
+		// Format the thumbnail URL as requested
+		if video.Thumbnail != "" {
+			// Extract the filename from the path
+			_, thumbnailFile := filepath.Split(video.Thumbnail)
+			videoData["thumbnail"] = "C:" + string(os.PathSeparator) + "Users" + string(os.PathSeparator) + "anime" + string(os.PathSeparator) + "Downloads" + string(os.PathSeparator) + "dsa" + string(os.PathSeparator) + "WT-CP" + string(os.PathSeparator) + "static" + string(os.PathSeparator) + "thumbnails" + string(os.PathSeparator) + thumbnailFile
+		}
+
+		videos = append(videos, videoData)
+	}
+
+	// Check for any errors during iteration
+	if err = rows.Err(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error iterating video data"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"videos": videos,
+		"count":  len(videos),
+	})
+}
+
+// Get thumbnail by video ID
+func getThumbnailHandler(c *gin.Context, db *sql.DB) {
+	videoID := c.Param("id")
+	if videoID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Video ID is required"})
+		return
+	}
+
+	// Query to get thumbnail path for the specified video ID
+	var thumbnailPath string
+	err := db.QueryRow("SELECT thumbnail FROM videos WHERE id = $1", videoID).Scan(&thumbnailPath)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Video not found"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch thumbnail"})
+		}
+		return
+	}
+
+	if thumbnailPath == "" {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Thumbnail not available"})
+		return
+	}
+
+	// Serve the thumbnail file
+	c.File(thumbnailPath)
+}
+
 func main() {
 	db := InitDB()
 	defer db.Close()
@@ -200,6 +280,16 @@ func main() {
 	// Upload route
 	router.POST("/upload", func(c *gin.Context) {
 		uploadHandler(c, db)
+	})
+
+	// Get all videos route
+	router.GET("/videos", func(c *gin.Context) {
+		getAllVideosHandler(c, db)
+	})
+
+	// Get thumbnail route
+	router.GET("/thumbnail/:id", func(c *gin.Context) {
+		getThumbnailHandler(c, db)
 	})
 
 	// Start server

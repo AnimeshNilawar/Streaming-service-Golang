@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as dashjs from 'dashjs';
+import '../styles/DashPlayer.css';
 
-const DashPlayer = () => {
+const DashPlayer = ({ initialVideoId, dashUrl, autoPlay = false }) => {
     const videoRef = useRef(null);
     const playerRef = useRef(null);
     const [videoId, setVideoId] = useState('');
-    const [currentVideoId, setCurrentVideoId] = useState('');
+    const [currentVideoId, setCurrentVideoId] = useState(initialVideoId || '');
     const [stats, setStats] = useState({
         downloadSpeed: 0,
         bufferLevel: 0,
@@ -13,9 +14,16 @@ const DashPlayer = () => {
         droppedFrames: 0
     });
 
-    // Construct the source URL based on video ID
+    // Set videoId from prop if provided
+    useEffect(() => {
+        if (initialVideoId) {
+            setCurrentVideoId(initialVideoId);
+        }
+    }, [initialVideoId]);
+
+    // Construct the source URL based on video ID or use provided dashUrl
     const getSourceUrl = (id) => {
-        return `http://localhost:8080/static/${id}_dash/manifest.mpd`;
+        return dashUrl || `http://localhost:8080/static/${id}_dash/manifest.mpd`;
     };
 
     // Handle form submission
@@ -28,7 +36,7 @@ const DashPlayer = () => {
 
     useEffect(() => {
         // Only initialize player if we have a video ID
-        if (!currentVideoId) return;
+        if (!currentVideoId && !dashUrl) return;
 
         const sourceUrl = getSourceUrl(currentVideoId);
         console.log(`Loading video from: ${sourceUrl}`);
@@ -131,55 +139,59 @@ const DashPlayer = () => {
                 playerRef.current = null;
             }
         };
-    }, [currentVideoId]);
+    }, [currentVideoId, dashUrl]);
+
+    // Only show the form if no initialVideoId was provided
+    const showForm = !initialVideoId && !dashUrl;
 
     return (
-        <div className="w-full">
-            <div className="mb-4">
-                <form onSubmit={handleSubmit} className="flex gap-2">
-                    <input
-                        type="text"
-                        value={videoId}
-                        onChange={(e) => setVideoId(e.target.value)}
-                        placeholder="Enter video ID"
-                        className="flex-1 p-2 border border-gray-300 rounded"
-                    />
-                    <button 
-                        type="submit" 
-                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                    >
-                        Load Video
-                    </button>
-                </form>
-            </div>
+        <div className="dash-player-wrapper">
+            {showForm && (
+                <div className="mb-4">
+                    <form onSubmit={handleSubmit} className="flex gap-2">
+                        <input
+                            type="text"
+                            value={videoId}
+                            onChange={(e) => setVideoId(e.target.value)}
+                            placeholder="Enter video ID"
+                            className="flex-1 p-2 border border-gray-300 rounded"
+                        />
+                        <button
+                            type="submit"
+                            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                        >
+                            Load Video
+                        </button>
+                    </form>
+                </div>
+            )}
 
-            {currentVideoId ? (
+            {(currentVideoId || dashUrl) ? (
                 <>
-                    <video
-                        ref={videoRef}
-                        controls
-                        style={{ width: '100%' }}
-                        className="rounded-lg shadow-lg"
-                    />
-                    
-                    <div className="mt-4 p-4 bg-gray-100 rounded-lg shadow text-sm font-mono">
-                        <div className="mb-2 font-bold">
-                            Playing: {currentVideoId}
-                        </div>
-                        <div className="grid grid-cols-2 gap-2">
-                            <div className="flex items-center">
+                    <div className="player-container">
+                        <video
+                            ref={videoRef}
+                            controls
+                            autoPlay={autoPlay}
+                            className="video-player"
+                        />
+                    </div>
+
+                    <div className="video-stats">
+                        <div className="grid">
+                            <div className="flex">
                                 <span className="mr-2">📶</span>
                                 <span>Download: <strong>{stats.downloadSpeed}</strong> kbps</span>
                             </div>
-                            <div className="flex items-center">
+                            <div className="flex">
                                 <span className="mr-2">📊</span>
                                 <span>Buffer: <strong>{stats.bufferLevel}</strong> sec</span>
                             </div>
-                            <div className="flex items-center">
+                            <div className="flex">
                                 <span className="mr-2">🎞</span>
                                 <span>Bitrate: <strong>{stats.bitrate}</strong> kbps</span>
                             </div>
-                            <div className="flex items-center">
+                            <div className="flex">
                                 <span className="mr-2">📉</span>
                                 <span>Dropped: <strong>{stats.droppedFrames}</strong> frames</span>
                             </div>
@@ -187,8 +199,8 @@ const DashPlayer = () => {
                     </div>
                 </>
             ) : (
-                <div className="p-6 bg-gray-100 rounded-lg text-center">
-                    <p className="text-gray-600">Enter a video ID to start playback</p>
+                <div className="player-placeholder">
+                    <p>Enter a video ID to start playback</p>
                 </div>
             )}
         </div>
