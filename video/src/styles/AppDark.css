@@ -7,9 +7,9 @@ body {
 }
 
 #root {
-    max-width: 1280px;
+    max-width: 100%; /* Changed from 1280px to full width */
     margin: 0 auto;
-    padding: 2rem;
+    padding: 1rem; /* Reduced padding */
 }
 
 .app-container {
