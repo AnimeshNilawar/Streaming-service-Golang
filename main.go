@@ -73,31 +73,6 @@ func getVideoDuration(path string) (string, error) {
 	return string(output), nil
 }
 
-// Generate thumbnail from video
-// func generateThumbnail(videoPath string, videoID string) (string, error) {
-// 	// Create thumbnails directory if it doesn't exist
-// 	thumbnailDir := "static/thumbnails"
-// 	if err := os.MkdirAll(thumbnailDir, 0755); err != nil {
-// 		return "", err
-// 	}
-
-// 	// Generate thumbnail at 1 second mark
-// 	thumbnailPath := filepath.ToSlash(filepath.Join(thumbnailDir, videoID+".jpg"))
-// 	cmd := exec.Command("ffmpeg",
-// 		"-i", videoPath,
-// 		"-ss", "00:00:01.000",
-// 		"-vframes", "1",
-// 		"-vf", "scale=480:-1",
-// 		thumbnailPath,
-// 	)
-
-// 	if err := cmd.Run(); err != nil {
-// 		return "", err
-// 	}
-
-// 	return thumbnailPath, nil
-// }
-
 // Handle Upload
 func uploadHandler(c *gin.Context, db *sql.DB) {
 	// Get form fields
