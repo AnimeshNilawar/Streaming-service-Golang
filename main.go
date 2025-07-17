@@ -28,7 +28,7 @@ type VideoMeta struct {
 
 // Init Postgres DB
 func InitDB() *sql.DB {
-	connStr := "user=admin password=12345 dbname=streaming-service sslmode=disable"
+	connStr := "user=admin password=admin dbname=streaming sslmode=disable"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatal("Failed to connect to DB:", err)
